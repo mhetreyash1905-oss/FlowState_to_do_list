@@ -1,0 +1,140 @@
+/* ===== GLOBAL RESET & TOKENS ===== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;600;700;800&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Colors */
+  --clr-bg: #0a0a0f;
+  --clr-bg-2: #0f0f1a;
+  --clr-surface: #13131f;
+  --clr-surface-2: #1a1a2e;
+  --clr-border: rgba(255, 255, 255, 0.07);
+
+  --clr-primary: #7c5cfc;
+  --clr-primary-2: #9b7dff;
+  --clr-accent: #00e5ff;
+  --clr-accent-2: #ff6f91;
+  --clr-green: #00ffb3;
+
+  --clr-text: #e8e8f0;
+  --clr-text-muted: #7a7a9a;
+  --clr-text-dim: #4a4a6a;
+
+  /* Gradients */
+  --grad-primary: linear-gradient(135deg, #7c5cfc, #00e5ff);
+  --grad-hero: linear-gradient(135deg, #7c5cfc 0%, #9b7dff 40%, #00e5ff 100%);
+  --grad-card: linear-gradient(145deg, rgba(124, 92, 252, 0.12), rgba(0, 229, 255, 0.05));
+  /* --grad-glow: radial-gradient(ellipse at center, rgba(124, 92, 252, 0.25) 0%, transparent 70%); */
+
+  /* Typography */
+  --font-head: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Spacing */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: 6rem;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-glow: 0 0 40px rgba(124, 92, 252, 0.3);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-accent: 0 0 20px rgba(0, 229, 255, 0.2);
+
+  /* Transitions */
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--clr-bg);
+  color: var(--clr-text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--clr-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--clr-primary);
+  border-radius: var(--radius-full);
+}
+
+/* ===== UTILITY ===== */
+.container {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: var(--space-lg);
+}
+
+.container-wide {
+  width: 100%;
+  max-width: 95%;
+  margin-inline: auto;
+  padding-inline: var(--space-lg);
+}
+
+.gradient-text {
+  background: var(--grad-hero);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--clr-primary-2);
+  background: rgba(124, 92, 252, 0.12);
+  border: 1px solid rgba(124, 92, 252, 0.25);
+  border-radius: var(--radius-full);
+  padding: 0.35rem 1rem;
+  margin-bottom: var(--space-md);
+}

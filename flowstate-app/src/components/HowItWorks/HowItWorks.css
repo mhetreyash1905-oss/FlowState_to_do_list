@@ -1,0 +1,147 @@
+/* ===== HOW IT WORKS ===== */
+.how-it-works {
+  padding: var(--space-2xl) 0;
+  background: var(--clr-bg-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.how-it-works::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(124,92,252,0.08) 0%, transparent 70%);
+}
+
+.how-it-works__header {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto var(--space-xl);
+  position: relative;
+}
+
+.how-it-works__title {
+  font-family: var(--font-head);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: var(--space-sm);
+}
+
+.how-it-works__subtitle {
+  font-size: 1.05rem;
+  color: var(--clr-text-muted);
+}
+
+/* Steps */
+.how-it-works__steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+  position: relative;
+}
+
+/* Connector line */
+.how-it-works__steps::before {
+  content: '';
+  position: absolute;
+  top: 36px;
+  left: calc(16.67% + 24px);
+  right: calc(16.67% + 24px);
+  height: 2px;
+  background: linear-gradient(to right, var(--clr-primary), var(--clr-accent));
+  z-index: 0;
+}
+
+@media (max-width: 768px) {
+  .how-it-works__steps::before { display: none; }
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.step__number {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-head);
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: var(--space-md);
+  position: relative;
+  transition: var(--transition);
+}
+
+.step__number::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: var(--grad-primary);
+  z-index: -1;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.step:hover .step__number {
+  transform: scale(1.12);
+}
+
+.step:hover .step__number::before {
+  opacity: 0.25;
+}
+
+.step-num--1 {
+  background: linear-gradient(135deg, rgba(124,92,252,0.2), rgba(124,92,252,0.05));
+  border: 2px solid rgba(124,92,252,0.4);
+  color: var(--clr-primary-2);
+}
+
+.step-num--2 {
+  background: linear-gradient(135deg, rgba(0,229,255,0.15), rgba(0,229,255,0.05));
+  border: 2px solid rgba(0,229,255,0.4);
+  color: var(--clr-accent);
+}
+
+.step-num--3 {
+  background: linear-gradient(135deg, rgba(0,255,179,0.15), rgba(0,255,179,0.05));
+  border: 2px solid rgba(0,255,179,0.4);
+  color: var(--clr-green);
+}
+
+.step__icon {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.step__title {
+  font-family: var(--font-head);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+
+.step__desc {
+  font-size: 0.9rem;
+  color: var(--clr-text-muted);
+  line-height: 1.65;
+  max-width: 240px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .how-it-works__steps {
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+  }
+}
