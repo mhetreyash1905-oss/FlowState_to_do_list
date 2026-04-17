@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../context/AuthContext';
-import { getActivityLog, getHeatmapData } from '../../utils/activityLog';
+import { getHeatmapData } from '../../utils/activityLog';
+import api from '../../utils/api';
 import './UserDashboard.css';
 
 // ─── helpers ─────────────────────────────────────────────
@@ -24,38 +26,6 @@ function levelClass(v) {
   if (v <= 6)  return 'l3';
   return 'l4';
 }
-
-const ACTION_META = {
-  completed: { emoji: '✅', verb: 'Completed',  status: 'done'  },
-  unchecked: { emoji: '↩️', verb: 'Unchecked',   status: 'miss'  },
-  added:     { emoji: '➕', verb: 'Added',       status: 'done'  },
-  deleted:   { emoji: '🗑️', verb: 'Deleted',     status: 'miss'  },
-  plus:      { emoji: '👍', verb: '+1 on',       status: 'done'  },
-  minus:     { emoji: '👎', verb: '-1 on',       status: 'miss'  },
-};
-
-function formatTime(isoStr) {
-  const d = new Date(isoStr);
-  const now = new Date();
-  const diffMs = now - d;
-  const mins = Math.floor(diffMs / 60000);
-  if (mins < 1)  return 'Just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24)  return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  if (days === 1) return 'Yesterday';
-  if (days < 7)  return `${days} days ago`;
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-
-const CATEGORY_COLORS = {
-  daily:   '#7c5cfc',
-  weekly:  '#00e5ff',
-  monthly: '#00ffb3',
-  habit:   '#ff6f91',
-  todo:    '#ffd740',
-};
 
 // ─── Component ────────────────────────────────────────────
 export default function UserDashboard() {
@@ -93,7 +63,6 @@ export default function UserDashboard() {
   const todoPct    = todoTotal   ? Math.round((todoDone / todoTotal) * 100)     : 0;
   const habitPct   = habits.length ? Math.min(100, Math.max(0, Math.round(((habitScore + habits.length * 3) / (habits.length * 6)) * 100))) : 0;
 
-  // Profile
   const [editing, setEditing] = useState(false);
   const [profile, setProfile] = useState(() => loadLS('fs_profile', {
     firstName: user?.firstName || '', lastName: user?.lastName || '',
@@ -118,9 +87,29 @@ export default function UserDashboard() {
   const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(' ') || 'FlowState User';
 
   // Real activity data
-  const activityLog   = getActivityLog(15);
   const heatmapData   = getHeatmapData(91);
   const totalActivity = heatmapData.reduce((a, c) => a + c.count, 0);
+
+  // Compute weekly summary from heatmap data
+  const getWeeklyData = () => {
+    const weeks = [];
+    const sortedData = heatmapData.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    for (let i = 0; i < sortedData.length; i += 7) {
+      const weekData = sortedData.slice(i, i + 7);
+      const startDate = weekData[0].date;
+      const weekTotal = weekData.reduce((sum, day) => sum + day.count, 0);
+      const weekNum = Math.floor(i / 7) + 1;
+      weeks.push({
+        week: `W${weekNum}`,
+        date: new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        actions: weekTotal,
+      });
+    }
+    return weeks;
+  };
+
+  const weeklyData = getWeeklyData();
 
   return (
     <div className="udash">
@@ -320,36 +309,53 @@ export default function UserDashboard() {
               </div>
             </div>
 
-            {/* Recent activity — REAL from activity log */}
-            <div className="recent-card" id="recent-card">
-              <div className="recent-card__head">
-                <div className="recent-card__title">🕐 Recent Activity</div>
-                <NavLink to="/tracker" className="recent-card__link" id="recent-go-tracker">
-                  Open Tracker →
-                </NavLink>
+            {/* Weekly Activity Graph */}
+            <div className="activity-card" id="weekly-graph-card" style={{ gridColumn: '1 / -1', minHeight: '350px' }}>
+              <div className="activity-card__title" style={{ marginBottom: '1.5rem' }}>
+                📈 Weekly Activity Trend
               </div>
-              {activityLog.length === 0 && (
+              {weeklyData.length === 0 ? (
                 <div style={{padding:'2rem 1.4rem', textAlign:'center', color:'var(--clr-text-dim)', fontSize:'0.85rem'}}>
-                  No activity yet — start checking off tasks in the{' '}
+                  No activity data yet — start checking off tasks in the{' '}
                   <NavLink to="/tracker" style={{color:'var(--clr-primary-2)', fontWeight:600}}>Tracker</NavLink>!
                 </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={280}>
+                  <LineChart data={weeklyData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--clr-surface-2)" />
+                    <XAxis 
+                      dataKey="week" 
+                      stroke="var(--clr-text-dim)"
+                      style={{ fontSize: '0.85rem' }}
+                    />
+                    <YAxis 
+                      stroke="var(--clr-text-dim)"
+                      style={{ fontSize: '0.85rem' }}
+                      label={{ value: 'Actions', angle: -90, position: 'insideLeft', offset: 10, style: { fontSize: '0.85rem' } }}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'var(--clr-surface-2)',
+                        border: '1px solid var(--clr-surface-3)',
+                        borderRadius: '0.5rem',
+                        color: 'var(--clr-text)',
+                      }}
+                      labelStyle={{ color: 'var(--clr-text)' }}
+                      formatter={(value) => [`${value} actions`, 'Weekly Total']}
+                      labelFormatter={(label) => `${label}`}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="actions" 
+                      stroke="#7c5cfc" 
+                      strokeWidth={2.5}
+                      dot={{ fill: '#7c5cfc', r: 5 }}
+                      activeDot={{ r: 7 }}
+                      isAnimationActive={true}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               )}
-              {activityLog.map((item, i) => {
-                const meta = ACTION_META[item.action] || { emoji:'📌', verb:'Action on', status:'due' };
-                return (
-                  <div key={item.id || i} className="recent-item" id={`recent-item-${i}`}>
-                    <div className="recent-item__dot" style={{ background: CATEGORY_COLORS[item.category] || '#7c5cfc' }} />
-                    <div className="recent-item__text">
-                      {meta.verb} "<strong>{item.title}</strong>"
-                    </div>
-                    <div className="recent-item__cat">{item.category}</div>
-                    <div className="recent-item__time">{formatTime(item.timestamp)}</div>
-                    <div className={`recent-item__status status-${meta.status}`}>
-                      {meta.status === 'done' ? '✓ Done' : meta.status === 'due' ? '◷ Due' : '✗ Change'}
-                    </div>
-                  </div>
-                );
-              })}
             </div>
 
           </div>

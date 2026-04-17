@@ -1,17 +1,19 @@
+import { Link } from 'react-router-dom';
 import './Hero.css';
 
 const tasks = [
   { id: 1, text: 'Design new dashboard UI', tag: 'Work', tagClass: 'tag-work', done: true },
-  { id: 2, text: 'Morning workout – 30 min', tag: 'Health', tagClass: 'tag-health', done: true },
-  { id: 3, text: 'Read: Atomic Habits ch.5', tag: 'Learn', tagClass: 'tag-learn', done: false },
+  { id: 2, text: 'Morning workout – 30 min', tag: 'Health', tagClass: 'tag-health', done: false },
+  { id: 3, text: 'Read: Atomic Habits ch.5', tag: 'Learn', tagClass: 'tag-learn', done: true },
+  
   { id: 4, text: 'Redesign landing page', tag: 'Design', tagClass: 'tag-design', done: false },
 ];
 
-const stats = [
-  { value: '120K+', label: 'Active Users' },
-  { value: '4.9★', label: 'App Store Rating' },
-  { value: '98%', label: 'Satisfaction' },
-];
+// const stats = [
+//   { value: '120K+', label: 'Active Users' },
+//   { value: '4.9★', label: 'App Store Rating' },
+//   { value: '98%', label: 'Satisfaction' },
+// ];
 
 export default function Hero() {
   return (
@@ -22,6 +24,7 @@ export default function Hero() {
         <div className="hero__orb hero__orb--1"></div>
         <div className="hero__orb hero__orb--2"></div>
         <div className="hero__orb hero__orb--3"></div>
+        <div className="hero__orb hero__orb--4"></div>
       </div>
 
       <div className="container">
@@ -43,12 +46,14 @@ export default function Hero() {
           </p>
 
           <div className="hero__actions">
-            <button className="btn-hero-primary" id="hero-cta-primary">
+            <Link className="btn-hero-primary" id="hero-cta-primary" to="/register">
               ✦ Start for Free
-            </button>
-            <button className="btn-hero-secondary" id="hero-cta-secondary">
+            </Link>
+
+            <Link className="btn-hero-secondary" id="hero-cta-secondary" to="/how-it-works">
               ▶ Watch demo
-            </button>
+            </Link>
+
           </div>
 
           {/* Stats */}

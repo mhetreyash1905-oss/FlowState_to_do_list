@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { logActivity } from '../../utils/activityLog';
+import api from '../../utils/api';
 import './Dashboard.css';
 
 // ─── helpers ────────────────────────────────────────────
@@ -244,85 +245,192 @@ export default function Dashboard() {
   const [view, setView] = useState('daily'); // 'daily' | 'weekly' | 'monthly'
 
   // ── State ──
-  const [habits, setHabits]   = useState(() => loadLS('fs_habits2', SEED.habits));
-  const [daily, setDaily]     = useState(() => resetItems(loadLS('fs_daily3', SEED.daily), todayStr));
-  const [weekly, setWeekly]   = useState(() => resetItems(loadLS('fs_weekly3', SEED.weekly), weekKey));
-  const [monthly, setMonthly] = useState(() => resetItems(loadLS('fs_monthly3', SEED.monthly), monthKey));
-  const [todos, setTodos]     = useState(() => loadLS('fs_todos2', SEED.todos));
+  const [habits, setHabits]   = useState([]);
+  const [daily, setDaily]     = useState([]);
+  const [weekly, setWeekly]   = useState([]);
+  const [monthly, setMonthly] = useState([]);
+  const [todos, setTodos]     = useState([]);
+  const [loadingData, setLoadingData] = useState(false);
 
-  useEffect(() => saveLS('fs_habits2',  habits),  [habits]);
-  useEffect(() => saveLS('fs_daily3',   daily),   [daily]);
-  useEffect(() => saveLS('fs_weekly3',  weekly),  [weekly]);
-  useEffect(() => saveLS('fs_monthly3', monthly), [monthly]);
-  useEffect(() => saveLS('fs_todos2',   todos),   [todos]);
+  const normalizeTask = (task) => ({
+    ...task,
+    id: task._id || task.id,
+    title: task.title,
+    type: task.type || 'daily',
+    completed: task.completed ?? task.done ?? false,
+    done: task.done ?? task.completed ?? false,
+    completedPeriod: task.completedPeriod || null,
+    streak: task.streak || 0,
+    color: task.color || '#00e5ff',
+    status: task.status || ((task.completed || task.done) ? 'complete' : 'active'),
+  });
 
-  // ── Habit handlers ──
-  const addHabit = useCallback(title => {
-    setHabits(h => [...h, { id:nextId(h), title, score:0 }]);
-    logActivity('added', title, 'habit');
-  }, []);
-  const plusHabit = useCallback(id => {
-    setHabits(h => h.map(i => {
-      if (i.id!==id) return i;
-      logActivity('plus', i.title, 'habit');
-      return { ...i, score: i.score+1 };
-    }));
-  }, []);
-  const minusHabit = useCallback(id => {
-    setHabits(h => h.map(i => {
-      if (i.id!==id) return i;
-      logActivity('minus', i.title, 'habit');
-      return { ...i, score: i.score-1 };
-    }));
-  }, []);
-  const deleteHabit = useCallback(id => {
-    setHabits(h => { const item = h.find(i=>i.id===id); if(item) logActivity('deleted',item.title,'habit'); return h.filter(i=>i.id!==id); });
+  const loadTrackerData = async () => {
+    if (!user) return;
+    setLoadingData(true);
+    try {
+      const [habitsRes, tasksRes] = await Promise.all([
+        api.get('/user/habits'),
+        api.get('/user/tasks'),
+      ]);
+      setHabits(habitsRes.data.map(h => ({ ...normalizeTask(h), id: h._id })));
+      const loadedTasks = tasksRes.data.map(normalizeTask);
+      setDaily(loadedTasks.filter(t => t.type === 'daily'));
+      setWeekly(loadedTasks.filter(t => t.type === 'weekly'));
+      setMonthly(loadedTasks.filter(t => t.type === 'monthly'));
+      setTodos(loadedTasks.filter(t => t.type === 'todo'));
+    } catch (err) {
+      console.error('Failed to load tracker data', err);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTrackerData();
+  }, [user]);
+
+  const saveHabit = async (habit) => {
+    try {
+      const res = await api.put(`/user/habits/${habit.id}`, habit);
+      setHabits(h => h.map(item => item.id === habit.id ? normalizeTask(res.data) : item));
+    } catch (err) {
+      console.error('Failed to save habit', err);
+    }
+  };
+
+  const addHabit = useCallback(async (title) => {
+    try {
+      const res = await api.post('/user/habits', { title, score: 0, category: 'habit' });
+      setHabits(h => [...h, { ...normalizeTask(res.data), id: res.data._id }]);
+      logActivity('added', title, 'habit');
+    } catch (err) {
+      console.error('Failed to add habit', err);
+    }
   }, []);
 
-  // ── Generic recurring handlers ──
-  function makeRecurringHandlers(setter, category, periodKeyFn) {
-    const add = (title) => {
-      setter(arr => [...arr, { id:nextId(arr), title, completed:false, completedPeriod:null, streak:0, color:COLORS[arr.length%COLORS.length] }]);
-      logActivity('added', title, category);
+  const plusHabit = useCallback(async (id) => {
+    const habit = habits.find(h => h.id === id);
+    if (!habit) return;
+    const updated = { ...habit, score: habit.score + 1 };
+    setHabits(h => h.map(item => item.id === id ? updated : item));
+    logActivity('plus', habit.title, 'habit');
+    await saveHabit(updated);
+  }, [habits]);
+
+  const minusHabit = useCallback(async (id) => {
+    const habit = habits.find(h => h.id === id);
+    if (!habit) return;
+    const updated = { ...habit, score: habit.score - 1 };
+    setHabits(h => h.map(item => item.id === id ? updated : item));
+    logActivity('minus', habit.title, 'habit');
+    await saveHabit(updated);
+  }, [habits]);
+
+  const deleteHabit = useCallback(async (id) => {
+    const item = habits.find(h => h.id === id);
+    if (item) logActivity('deleted', item.title, 'habit');
+    try {
+      await api.delete(`/user/habits/${id}`);
+      setHabits(h => h.filter(i => i.id !== id));
+    } catch (err) {
+      console.error('Failed to delete habit', err);
+    }
+  }, [habits]);
+
+  const saveTask = async (task) => {
+    try {
+      const res = await api.put(`/user/tasks/${task.id}`, task);
+      const normalized = normalizeTask(res.data);
+      setDaily(arr => arr.map(item => item.id === task.id ? normalized : item));
+      setWeekly(arr => arr.map(item => item.id === task.id ? normalized : item));
+      setMonthly(arr => arr.map(item => item.id === task.id ? normalized : item));
+      setTodos(arr => arr.map(item => item.id === task.id ? normalized : item));
+    } catch (err) {
+      console.error('Failed to save task', err);
+    }
+  };
+
+  const addTask = useCallback(async (task) => {
+    try {
+      const res = await api.post('/user/tasks', task);
+      const normalized = normalizeTask(res.data);
+      if (task.type === 'daily') setDaily(prev => [...prev, normalized]);
+      if (task.type === 'weekly') setWeekly(prev => [...prev, normalized]);
+      if (task.type === 'monthly') setMonthly(prev => [...prev, normalized]);
+      if (task.type === 'todo') setTodos(prev => [...prev, normalized]);
+      logActivity('added', task.title, task.type);
+    } catch (err) {
+      console.error('Failed to add task', err);
+    }
+  }, []);
+
+  const deleteTask = useCallback(async (id, type) => {
+    try {
+      const source = type === 'todo' ? todos : type === 'daily' ? daily : type === 'weekly' ? weekly : monthly;
+      const item = source.find(i => i.id === id);
+      if (item) logActivity('deleted', item.title, type);
+      await api.delete(`/user/tasks/${id}`);
+      if (type === 'daily') setDaily(d => d.filter(item => item.id !== id));
+      if (type === 'weekly') setWeekly(w => w.filter(item => item.id !== id));
+      if (type === 'monthly') setMonthly(m => m.filter(item => item.id !== id));
+      if (type === 'todo') setTodos(t => t.filter(item => item.id !== id));
+    } catch (err) {
+      console.error('Failed to delete task', err);
+    }
+  }, [daily, monthly, todos, weekly]);
+
+  function makeRecurringHandlers(setter, items, category, periodKeyFn) {
+    const add = async (title) => {
+      const color = ['#ff6b35','#ff9800','#ffd740','#00e5ff','#7c5cfc','#00ffb3','#ff6f91','#40c4ff'][Math.floor(Math.random() * 8)];
+      await addTask({ title, type: category, completed: false, completedPeriod: null, streak: 0, color, status: 'active' });
     };
-    const toggle = (id) => {
-      setter(arr => arr.map(i => {
-        if (i.id!==id) return i;
-        const completing = !i.completed;
-        logActivity(completing ? 'completed' : 'unchecked', i.title, category);
-        return {
-          ...i,
-          completed: completing,
-          completedPeriod: completing ? periodKeyFn() : null,
-          streak: completing ? i.streak+1 : Math.max(0, i.streak-1),
-        };
-      }));
+    const toggle = async (id) => {
+      const task = items.find(i => i.id === id);
+      if (!task) return;
+      const completing = !task.completed;
+      const updated = {
+        ...task,
+        completed: completing,
+        done: completing,
+        completedPeriod: completing ? periodKeyFn() : null,
+        streak: completing ? task.streak + 1 : Math.max(0, task.streak - 1),
+        status: completing ? 'complete' : 'active',
+      };
+      setter(arr => arr.map(i => i.id === id ? updated : i));
+      logActivity(completing ? 'completed' : 'unchecked', task.title, category);
+      await saveTask(updated);
     };
-    const del = (id) => {
-      setter(arr => { const item = arr.find(i=>i.id===id); if(item) logActivity('deleted',item.title,category); return arr.filter(i=>i.id!==id); });
+    const del = async (id) => {
+      await deleteTask(id, category);
     };
     return { add, toggle, del };
   }
 
-  const dailyH   = makeRecurringHandlers(setDaily,   'daily',   todayStr);
-  const weeklyH  = makeRecurringHandlers(setWeekly,  'weekly',  weekKey);
-  const monthlyH = makeRecurringHandlers(setMonthly, 'monthly', monthKey);
+  const dailyH   = makeRecurringHandlers(setDaily, daily, 'daily', todayStr);
+  const weeklyH  = makeRecurringHandlers(setWeekly, weekly, 'weekly', weekKey);
+  const monthlyH = makeRecurringHandlers(setMonthly, monthly, 'monthly', monthKey);
 
   // ── Todo handlers ──
-  const addTodo = useCallback(title => {
-    setTodos(t => [...t, { id:nextId(t), title, done:false, status:'active' }]);
-    logActivity('added', title, 'todo');
+  const addTodo = useCallback(async (title) => {
+    await addTask({ title, type: 'todo', done: false, completed: false, status: 'active' });
   }, []);
-  const toggleTodo = useCallback(id => {
-    setTodos(t => t.map(i => {
-      if (i.id!==id) return i;
-      logActivity(!i.done ? 'completed' : 'unchecked', i.title, 'todo');
-      return { ...i, done: !i.done, status: !i.done ? 'complete' : 'active' };
-    }));
-  }, []);
-  const deleteTodo = useCallback(id => {
-    setTodos(t => { const item = t.find(i=>i.id===id); if(item) logActivity('deleted',item.title,'todo'); return t.filter(i=>i.id!==id); });
-  }, []);
+  const toggleTodo = useCallback(async (id) => {
+    const task = todos.find(i => i.id === id);
+    if (!task) return;
+    const updated = {
+      ...task,
+      done: !task.done,
+      completed: !task.done,
+      status: !task.done ? 'complete' : 'active',
+    };
+    setTodos(t => t.map(i => i.id === id ? updated : i));
+    logActivity(!task.done ? 'completed' : 'unchecked', task.title, 'todo');
+    await saveTask(updated);
+  }, [todos]);
+  const deleteTodo = useCallback(async (id) => {
+    await deleteTask(id, 'todo');
+  }, [deleteTask]);
 
   // ── Greeting ──
   const hour = new Date().getHours();

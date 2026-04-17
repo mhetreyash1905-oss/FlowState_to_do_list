@@ -117,7 +117,7 @@ function StepIndicator({ current }) {
 // ── Register Page ─────────────────────────────────────────
 export default function RegisterPage() {
   const navigate  = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
   const [step, setStep]     = useState(0);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -166,7 +166,7 @@ export default function RegisterPage() {
     return e;
   };
 
-  const next = (ev) => {
+  const next = async (ev) => {
     ev.preventDefault();
     const e = validate();
     setErrors(e);
@@ -174,13 +174,22 @@ export default function RegisterPage() {
     if (step < 2) { setStep(s => s + 1); return; }
     // Final submit
     setLoading(true);
-    setTimeout(() => {
-      login({ firstName: form.firstName, lastName: form.lastName, email: form.email, occupation: form.occupation });
-      setLoading(false);
+    try {
+      await register({
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        password: form.password,
+        occupation: form.occupation,
+        goals: form.goals,
+      });
       navigate('/dashboard');
-    }, 1400);
+    } catch (err) {
+      setErrors({ general: err.message });
+    } finally {
+      setLoading(false);
+    }
   };
-
   const back = () => { setStep(s => s - 1); setErrors({}); };
 
   const strengthColors = { weak: 'filled-weak', medium: 'filled-medium', strong: 'filled-strong' };

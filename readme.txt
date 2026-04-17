@@ -1,9 +1,21 @@
 v1.0 deadline 29 may 2026
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
+mongodb+srv://iit2025022:<Omyash@1905>@cluster-flowstate.plfrowg.mongodb.net/
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+first priority making the app working online 
+    store data online o mongodb
+        create a backend stack
+
 
 this project has to add, 
 user details :-
     gender, height, weight, etc etc. user image.
+
+    add sound to task completion different for tasks todo and habits .
 
 fix colour scheme for main page , not home page.
     minimalistic plus cool.

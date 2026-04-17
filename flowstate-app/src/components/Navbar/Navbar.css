@@ -50,7 +50,7 @@
 .navbar__logo-text {
   background: var(--grad-hero);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: constant(--clr-text);
   background-clip: text;
 }
 
@@ -97,7 +97,7 @@
 
 .navbar__link--highlighted::after {
   width: 100% !important;
-  background: var(--grad-primary);
+  background: constant(--grad-primary);
 }
 
 /* CTA */

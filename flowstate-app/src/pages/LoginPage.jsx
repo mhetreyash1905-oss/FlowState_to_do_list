@@ -59,19 +59,20 @@ export default function LoginPage() {
     return e;
   };
 
-  const handleSubmit = (ev) => {
+  const handleSubmit = async (ev) => {
     ev.preventDefault();
     const e = validate();
     setErrors(e);
     if (Object.keys(e).length) return;
     setLoading(true);
-    setTimeout(() => {
-      // Extract name from email as fallback
-      const namePart = form.email.split('@')[0];
-      login({ email: form.email, firstName: namePart, lastName: '' });
-      setLoading(false);
+    try {
+      await login({ email: form.email, password: form.password });
       navigate('/dashboard');
-    }, 1000);
+    } catch (err) {
+      setErrors({ general: err.message });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
