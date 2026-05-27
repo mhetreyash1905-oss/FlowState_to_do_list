@@ -1,4 +1,4 @@
-v1.0 deadline 29 may 2026
+v1.0 deadline 29 June 2026
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
 mongodb+srv://iit2025022:<Omyash@1905>@cluster-flowstate.plfrowg.mongodb.net/
@@ -14,6 +14,10 @@ first priority making the app working online
 this project has to add, 
 user details :-
     gender, height, weight, etc etc. user image.
+
+    for login on timezone add options in a drop down menu to add options of timezones to select from
+
+    create db to store from where a person gets to know about flowstate
 
     add sound to task completion different for tasks todo and habits .
 

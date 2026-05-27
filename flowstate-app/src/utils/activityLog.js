@@ -2,18 +2,29 @@
 // Records every action (complete, miss, add, etc.) with timestamps.
 // Used by UserDashboard for recent activity feed + heatmap.
 
-const KEY = 'fs_activity_log';
+const USER_KEY = 'fs_user';
+
+function getLogKey() {
+  try {
+    const user = JSON.parse(localStorage.getItem(USER_KEY));
+    const id = user?.id || user?._id || 'guest';
+    return `fs_activity_log_${id}`;
+  } catch {
+    return 'fs_activity_log_guest';
+  }
+}
 
 function loadLog() {
-  try { const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : []; }
+  const key = getLogKey();
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : []; }
   catch { return []; }
 }
 
 function saveLog(log) {
+  const key = getLogKey();
   try {
-    // Keep only last 500 entries
     const trimmed = log.slice(-500);
-    localStorage.setItem(KEY, JSON.stringify(trimmed));
+    localStorage.setItem(key, JSON.stringify(trimmed));
   } catch {}
 }
 

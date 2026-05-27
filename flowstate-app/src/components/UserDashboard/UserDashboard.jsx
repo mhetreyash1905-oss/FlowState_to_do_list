@@ -6,13 +6,6 @@ import { getHeatmapData } from '../../utils/activityLog';
 import api from '../../utils/api';
 import './UserDashboard.css';
 
-// ─── helpers ─────────────────────────────────────────────
-function loadLS(key, fb) {
-  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fb; }
-  catch { return fb; }
-}
-function saveLS(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} }
-
 const OCCUPATIONS = [
   'Student','Software Engineer / Developer','Designer / Creative',
   'Product Manager','Marketing / Sales','Entrepreneur / Founder',
@@ -29,21 +22,83 @@ function levelClass(v) {
 
 // ─── Component ────────────────────────────────────────────
 export default function UserDashboard() {
-  const { user, login } = useAuth();
-  const [refreshKey, setRefreshKey] = useState(0);
+  const { user, updateUser } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [habits, setHabits]   = useState([]);
+  const [daily, setDaily]     = useState([]);
+  const [weekly, setWeekly]   = useState([]);
+  const [monthly, setMonthly] = useState([]);
+  const [todos, setTodos]     = useState([]);
+  const [editing, setEditing] = useState(false);
+  const [profile, setProfile] = useState({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    occupation: user?.occupation || '',
+    timezone: '',
+    bio: '',
+    goals: [],
+  });
 
-  // Refresh data every 10 seconds so it stays live
+  const normalizeTask = (task) => ({
+    ...task,
+    id: task._id || task.id,
+    title: task.title,
+    type: task.type || 'daily',
+    completed: task.completed ?? task.done ?? false,
+    done: task.done ?? task.completed ?? false,
+    completedPeriod: task.completedPeriod || null,
+    streak: task.streak || 0,
+    color: task.color || '#00e5ff',
+    status: task.status || ((task.completed || task.done) ? 'complete' : 'active'),
+  });
+
+  const normalizeHabit = (habit) => ({
+    ...habit,
+    id: habit._id || habit.id,
+    title: habit.title,
+    score: habit.score ?? 0,
+    streak: habit.streak ?? 0,
+    category: habit.category || 'habit',
+  });
+
   useEffect(() => {
-    const iv = setInterval(() => setRefreshKey(k => k + 1), 10000);
-    return () => clearInterval(iv);
-  }, []);
+    if (!user) return;
 
-  // Pull tracker data for live stats
-  const habits  = loadLS('fs_habits2',  []);
-  const daily   = loadLS('fs_daily3',   []);
-  const weekly  = loadLS('fs_weekly3',  []);
-  const monthly = loadLS('fs_monthly3', []);
-  const todos   = loadLS('fs_todos2',   []);
+    const loadDashboardData = async () => {
+      setLoading(true);
+      try {
+        const [profileRes, habitsRes, tasksRes] = await Promise.all([
+          api.get('/user/profile'),
+          api.get('/user/habits'),
+          api.get('/user/tasks'),
+        ]);
+
+        setProfile({
+          firstName: profileRes.data.firstName || user.firstName || '',
+          lastName: profileRes.data.lastName || user.lastName || '',
+          email: profileRes.data.email || user.email || '',
+          occupation: profileRes.data.occupation || user.occupation || '',
+          timezone: profileRes.data.timezone || '',
+          bio: profileRes.data.bio || '',
+          goals: profileRes.data.goals || [],
+        });
+
+        setHabits(habitsRes.data.map(normalizeHabit));
+        const loadedTasks = tasksRes.data.map(normalizeTask);
+        setDaily(loadedTasks.filter(t => t.type === 'daily'));
+        setWeekly(loadedTasks.filter(t => t.type === 'weekly'));
+        setMonthly(loadedTasks.filter(t => t.type === 'monthly'));
+        setTodos(loadedTasks.filter(t => t.type === 'todo'));
+      } catch (err) {
+        console.error('Failed to load user dashboard data', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, [user]);
 
   const dailyDone   = daily.filter(d => d.completed).length;
   const dailyTotal  = daily.length;
@@ -63,17 +118,31 @@ export default function UserDashboard() {
   const todoPct    = todoTotal   ? Math.round((todoDone / todoTotal) * 100)     : 0;
   const habitPct   = habits.length ? Math.min(100, Math.max(0, Math.round(((habitScore + habits.length * 3) / (habits.length * 6)) * 100))) : 0;
 
-  const [editing, setEditing] = useState(false);
-  const [profile, setProfile] = useState(() => loadLS('fs_profile', {
-    firstName: user?.firstName || '', lastName: user?.lastName || '',
-    email: user?.email || '', occupation: user?.occupation || '',
-    timezone: '', bio: '', goals: [],
-  }));
-  useEffect(() => saveLS('fs_profile', profile), [profile]);
   const set = (k, v) => setProfile(p => ({ ...p, [k]: v }));
-  const saveProfile = () => {
-    login({ ...user, firstName: profile.firstName, lastName: profile.lastName, occupation: profile.occupation });
-    setEditing(false);
+  const saveProfile = async () => {
+    try {
+      const res = await api.put('/user/profile', profile);
+      setProfile({
+        firstName: res.data.firstName || '',
+        lastName: res.data.lastName || '',
+        email: res.data.email || '',
+        occupation: res.data.occupation || '',
+        timezone: res.data.timezone || '',
+        bio: res.data.bio || '',
+        goals: res.data.goals || [],
+      });
+
+      updateUser({
+        id: res.data._id || res.data.id,
+        firstName: res.data.firstName,
+        lastName: res.data.lastName,
+        email: res.data.email,
+        occupation: res.data.occupation,
+      });
+      setEditing(false);
+    } catch (err) {
+      console.error('Failed to save profile', err);
+    }
   };
 
   const initials = profile.firstName && profile.lastName
