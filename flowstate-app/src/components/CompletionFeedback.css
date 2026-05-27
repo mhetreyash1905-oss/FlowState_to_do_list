@@ -1,0 +1,116 @@
+.completion-feedback {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.feedback-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: feedbackAppear 0.3s ease-out;
+}
+
+.feedback-icon {
+  font-size: 60px;
+  animation: iconBounce 0.6s ease-out;
+}
+
+.feedback-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feedback-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.feedback-coins {
+  margin: 0;
+  font-size: 28px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.coin-emoji {
+  font-size: 32px;
+  animation: coinSpin 0.6s ease-out;
+}
+
+@keyframes feedbackAppear {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes iconBounce {
+  0% {
+    transform: scale(0) rotateY(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotateY(180deg);
+  }
+  100% {
+    transform: scale(1) rotateY(360deg);
+    opacity: 1;
+  }
+}
+
+@keyframes coinSpin {
+  0% {
+    transform: rotateY(0) rotateZ(-15deg) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: rotateY(180deg) rotateZ(0) scale(1.1);
+  }
+  100% {
+    transform: rotateY(360deg) rotateZ(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .feedback-content {
+    padding: 20px 30px;
+    gap: 15px;
+  }
+
+  .feedback-icon {
+    font-size: 45px;
+  }
+
+  .feedback-title {
+    font-size: 20px;
+  }
+
+  .feedback-coins {
+    font-size: 24px;
+  }
+
+  .coin-emoji {
+    font-size: 28px;
+  }
+}

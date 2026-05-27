@@ -9,6 +9,9 @@ const userSchema = new mongoose.Schema({
   timezone: String,
   bio: String,
   goals: [String],
+  coins: { type: Number, default: 0 },
+  totalCoinsEarned: { type: Number, default: 0 },
+  totalCoinsPenalized: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
 });
 
