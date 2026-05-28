@@ -299,6 +299,9 @@ export default function UserDashboard() {
                 <NavLink to="/tracker" className={({isActive}) => `profile-nav-link ${isActive?'active':''}`} id="qnav-tracker">
                   <span>📅</span> Habit Tracker
                 </NavLink>
+                <NavLink to="/analytics" className={({isActive}) => `profile-nav-link ${isActive?'active':''}`} id="qnav-analytics">
+                  <span>📊</span> Analytics & AI
+                </NavLink>
                 <button className="profile-nav-link" id="qnav-settings" onClick={() => setEditing(true)}>
                   <span>⚙️</span> Edit Profile
                 </button>

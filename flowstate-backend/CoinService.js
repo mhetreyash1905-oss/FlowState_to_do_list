@@ -1,5 +1,5 @@
-import User from '../models/User.js';
-import CoinTransaction from '../models/CoinTransaction.js';
+import User from './models/User.js';
+import CoinTransaction from './models/CoinTransaction.js';
 
 const COIN_REWARDS = {
   easy: { habit: 10, task: 5 },

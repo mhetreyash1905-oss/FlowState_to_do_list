@@ -11,7 +11,7 @@ export default function Navbar() {
   const navigate    = useNavigate();
   const { user, logout } = useAuth();
 
-  const isApp = ['/dashboard', '/tracker'].includes(location.pathname);
+  const isApp = ['/dashboard', '/tracker', '/analytics'].includes(location.pathname);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 30);
@@ -71,6 +71,12 @@ export default function Navbar() {
                   📅 Tracker
                 </NavLink>
               </li>
+              <li>
+                <NavLink to="/analytics" className={({isActive}) => `navbar__link ${isActive?'navbar__link--highlighted':''}`}
+                  id="nav-app-analytics">
+                  📊 Analytics & AI
+                </NavLink>
+              </li>
             </>
           )}
         </ul>
@@ -109,6 +115,10 @@ export default function Navbar() {
                   <NavLink to="/tracker" className="nav-dropdown__item" id="dropdown-tracker"
                     onClick={() => setDropdownOpen(false)} role="menuitem">
                     <span>📅</span> Habit Tracker
+                  </NavLink>
+                  <NavLink to="/analytics" className="nav-dropdown__item" id="dropdown-analytics"
+                    onClick={() => setDropdownOpen(false)} role="menuitem">
+                    <span>📊</span> Analytics & AI
                   </NavLink>
                   <button className="nav-dropdown__item nav-dropdown__item--muted" id="dropdown-settings"
                     role="menuitem" onClick={() => setDropdownOpen(false)}>

@@ -10,6 +10,7 @@ import DashboardPage from './pages/DashboardPage';
 import TrackerPage   from './pages/TrackerPage';
 import LoginPage     from './pages/LoginPage';
 import RegisterPage  from './pages/RegisterPage';
+import AnalyticsPage from './pages/AnalyticsPage';
 
 const AUTH_ROUTES = ['/login', '/register'];
 
@@ -27,6 +28,7 @@ function AppInner() {
           <Route path="/tracker"   element={<TrackerPage />} />
           <Route path="/login"     element={<LoginPage />} />
           <Route path="/register"  element={<RegisterPage />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
         </Routes>
       </main>
       {!isAuth && <Footer />}

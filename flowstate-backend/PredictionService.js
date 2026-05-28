@@ -1,5 +1,5 @@
-import HabitCompletion from '../models/HabitCompletion.js';
-import Habit from '../models/Habit.js';
+import HabitCompletion from './models/HabitCompletion.js';
+import Habit from './models/Habit.js';
 
 /**
  * Calculate productivity score for tomorrow (0-100)

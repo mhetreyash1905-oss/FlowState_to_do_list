@@ -1,0 +1,566 @@
+/* ─── Analytics Page Styles ─── */
+
+.analytics-page {
+  padding: 8rem 0 4rem;
+  background: var(--clr-bg);
+  min-height: 100vh;
+  color: var(--clr-text);
+  font-family: var(--font-body);
+}
+
+.analytics-loading, .analytics-error {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--clr-surface-3);
+  border-top-color: var(--clr-primary-2);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.retry-btn {
+  background: linear-gradient(135deg, var(--clr-primary-1), var(--clr-primary-2));
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.retry-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(124, 92, 252, 0.4);
+}
+
+/* Header */
+.analytics-header-section {
+  margin-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.analytics-header-section h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  background: linear-gradient(135deg, #00e5ff, #7c5cfc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+}
+
+.analytics-header-section p {
+  color: var(--clr-text-muted);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.refresh-btn {
+  align-self: flex-start;
+  background: var(--clr-surface-2);
+  color: var(--clr-text);
+  border: 1px solid var(--clr-surface-3);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  transition: background 0.2s, border-color 0.2s;
+}
+.refresh-btn:hover {
+  background: var(--clr-surface-3);
+  border-color: var(--clr-text-muted);
+}
+
+/* 🧬 Habit Genome Card */
+.genome-card {
+  position: relative;
+  border-radius: 1.25rem;
+  padding: 2.5rem;
+  margin-bottom: 3rem;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.genome-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Theme Colors for Genome Archetypes */
+.genome-card--night-owl {
+  background: linear-gradient(135deg, #0b0c20 0%, #15193b 100%);
+  border-color: rgba(124, 92, 252, 0.2);
+}
+.genome-card--sprint-worker {
+  background: linear-gradient(135deg, #180c10 0%, #3a1520 100%);
+  border-color: rgba(255, 111, 145, 0.2);
+}
+.genome-card--consistency-monk {
+  background: linear-gradient(135deg, #05161a 0%, #0d2e35 100%);
+  border-color: rgba(0, 229, 255, 0.2);
+}
+.genome-card--chaotic-genius {
+  background: linear-gradient(135deg, #1d1705 0%, #3e330d 100%);
+  border-color: rgba(255, 215, 64, 0.2);
+}
+.genome-card--weekend-warrior {
+  background: linear-gradient(135deg, #051810 0%, #0d3824 100%);
+  border-color: rgba(0, 255, 179, 0.2);
+}
+.genome-card--balanced-achiever {
+  background: linear-gradient(135deg, #120a22 0%, #251642 100%);
+  border-color: rgba(124, 92, 252, 0.25);
+}
+
+.genome-card__ambient {
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 50%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(124, 92, 252, 0.15) 0%, transparent 60%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+.genome-card__header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.genome-card__avatar {
+  font-size: 3.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.05);
+}
+
+.genome-card__title-group {
+  flex: 1;
+}
+
+.genome-card__badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--clr-primary-2);
+  margin-bottom: 0.25rem;
+}
+
+.genome-card__header h2 {
+  font-size: 2rem;
+  font-family: var(--font-heading);
+  margin: 0;
+  color: white;
+}
+
+.confidence-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 10px;
+}
+.confidence-tag--high { background: rgba(0, 255, 179, 0.15); color: #00ffb3; }
+.confidence-tag--medium { background: rgba(255, 215, 64, 0.15); color: #ffd740; }
+.confidence-tag--low { background: rgba(255, 111, 145, 0.15); color: #ff6f91; }
+
+.genome-card__description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 1.5rem;
+  max-width: 800px;
+}
+
+.genome-card__traits {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.trait-tag {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+}
+
+.genome-card__stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 2rem;
+}
+
+.genome-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.genome-stat__val {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: white;
+  font-family: var(--font-heading);
+}
+
+.genome-stat__lbl {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* 🧠 Recommendation Engine Carousel (Netflix Style) */
+.recommendations-section {
+  margin-bottom: 4rem;
+}
+
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  margin-bottom: 1.5rem;
+}
+
+.title-sub {
+  font-size: 0.9rem;
+  color: var(--clr-text-muted);
+  font-weight: 500;
+  margin-left: 0.75rem;
+  background: var(--clr-surface-2);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+}
+
+.recommendations-carousel {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.recommendation-item {
+  background: var(--clr-surface-2);
+  border: 1px solid var(--clr-surface-3);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.recommendation-item:hover {
+  transform: translateY(-4px);
+  border-color: var(--clr-primary-2);
+  box-shadow: 0 12px 24px rgba(124,92,252,0.15);
+}
+
+.rec-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.rec-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.rec-tag--timing { background: rgba(0, 229, 255, 0.1); color: #00e5ff; }
+.rec-tag--bundle { background: rgba(124, 92, 252, 0.1); color: #7c5cfc; }
+.rec-tag--easier { background: rgba(255, 111, 145, 0.1); color: #ff6f91; }
+.rec-tag--replacement { background: rgba(0, 255, 179, 0.1); color: #00ffb3; }
+
+.rec-impact {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+.impact--veryhigh { background: rgba(0, 255, 179, 0.15); color: #00ffb3; }
+.impact--high { background: rgba(124, 92, 252, 0.15); color: #7c5cfc; }
+.impact--medium { background: rgba(255, 215, 64, 0.15); color: #ffd740; }
+.impact--low { background: rgba(255, 255, 255, 0.1); color: var(--clr-text-muted); }
+
+.rec-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: var(--clr-text);
+}
+
+.rec-desc {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--clr-text-dim);
+  margin: 0 0 1.5rem 0;
+  flex: 1;
+}
+
+.rec-footer {
+  border-top: 1px solid var(--clr-surface-3);
+  padding-top: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.rec-metric {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--clr-primary-2);
+}
+
+/* Visualizations Grid */
+.visualizations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.vis-panel {
+  background: var(--clr-surface-1);
+  border: 1px solid var(--clr-surface-2);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.vis-panel h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  margin: 0 0 0.25rem 0;
+  color: var(--clr-text);
+}
+
+.panel-sub {
+  font-size: 0.85rem;
+  color: var(--clr-text-muted);
+  margin: 0 0 1.5rem 0;
+}
+
+.chart-container {
+  width: 100%;
+  min-height: 260px;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Specific Panel Adaptations */
+.vis-panel--heatmap {
+  grid-column: 1 / -1;
+}
+
+.heatmap-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  gap: 6px;
+  grid-auto-flow: column;
+  padding: 0.5rem;
+  background: var(--clr-surface-2);
+  border-radius: 0.75rem;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.heatmap-cell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  min-height: 18px;
+  min-width: 18px;
+  transition: transform 0.1s;
+  cursor: pointer;
+}
+.heatmap-cell:hover {
+  transform: scale(1.25);
+  box-shadow: 0 0 8px rgba(124,92,252,0.5);
+  z-index: 10;
+}
+
+/* Color densities (GitHub cyan/purple matching Flowstate vibe) */
+.d0 { background-color: var(--clr-surface-3); }
+.d1 { background-color: #121535; border: 1px solid rgba(124,92,252,0.1); }
+.d2 { background-color: #27205a; }
+.d3 { background-color: #4b349b; }
+.d4 { background-color: #7c5cfc; }
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: flex-end;
+  font-size: 0.8rem;
+  color: var(--clr-text-muted);
+}
+
+.legend-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+/* Correlation Matrix Grid */
+.vis-panel--matrix {
+  grid-column: 1 / -1;
+}
+
+.matrix-wrapper {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  background: var(--clr-surface-2);
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.correlation-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.correlation-table th, .correlation-table td {
+  padding: 0.75rem;
+  border: 1px solid var(--clr-surface-3);
+  white-space: nowrap;
+}
+
+.correlation-table th {
+  background: var(--clr-surface-1);
+  color: var(--clr-text-dim);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.row-header {
+  font-weight: 600;
+  text-align: left;
+  background: var(--clr-surface-1);
+  color: var(--clr-text);
+  max-width: 150px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.correlation-cell {
+  font-weight: 700;
+  transition: transform 0.15s ease, filter 0.15s;
+  cursor: pointer;
+}
+
+.correlation-cell:hover {
+  transform: scale(1.08);
+  filter: brightness(1.15);
+  z-index: 5;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.no-data {
+  text-align: center;
+  color: var(--clr-text-muted);
+  padding: 2rem;
+  font-style: italic;
+}
+
+/* Footer Navigation Buttons */
+.analytics-shortcuts {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.shortcut-btn {
+  background: var(--clr-surface-2);
+  color: var(--clr-text);
+  border: 1px solid var(--clr-surface-3);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.shortcut-btn:hover {
+  background: var(--clr-surface-3);
+  border-color: var(--clr-text-muted);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .visualizations-grid {
+    grid-template-columns: 1fr;
+  }
+  .analytics-header-section h1 {
+    font-size: 2rem;
+  }
+  .genome-card {
+    padding: 1.5rem;
+  }
+  .genome-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
