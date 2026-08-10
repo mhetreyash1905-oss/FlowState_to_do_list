@@ -1,7 +1,6 @@
 v1.0 deadline 29 June 2026
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
-mongodb+srv://iit2025022:<Omyash@1905>@cluster-flowstate.plfrowg.mongodb.net/
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
